@@ -2,6 +2,7 @@
     import Button from "#lib/components/base/button.svelte";
     import Datepicker from "#lib/components/base/datepicker.svelte";
     import Select from "#lib/components/base/select.svelte";
+    import { RIDE_PROFILES, ROUTE_TYPES } from "#lib/util/ride_attributes.ts";
     import TextField from "#lib/components/base/text_field.svelte";
     import Toggle from "#lib/components/base/toggle.svelte";
     import ListSearchModal from "#lib/components/list/list_search_modal.svelte";
@@ -278,6 +279,9 @@
             : page.data.settings?.privacy?.trails === "public",
         category: defaultCategoryId(),
         subcategory: data.trail.subcategory || "",
+        route_type: (data.trail.route_type || "") as Trail["route_type"],
+        ride_profile: data.trail.ride_profile || "",
+        starts_home: data.trail.starts_home ?? false,
     });
 
     const {
@@ -2378,14 +2382,21 @@
             multiple
             chips
         ></Combobox>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Select
-                name="difficulty"
-                label={$_("difficulty")}
+                name="route_type"
+                label="Streckentyp"
                 items={[
-                    { text: $_("easy"), value: "easy" },
-                    { text: $_("moderate"), value: "moderate" },
-                    { text: $_("difficult"), value: "difficult" },
+                    { text: "— nicht gesetzt —", value: "" },
+                    ...ROUTE_TYPES.map((r) => ({ text: r.text, value: r.value })),
+                ]}
+            ></Select>
+            <Select
+                name="ride_profile"
+                label="Profil"
+                items={[
+                    { text: "— nicht gesetzt —", value: "" },
+                    ...RIDE_PROFILES,
                 ]}
             ></Select>
             <CategoryPicker
@@ -2397,6 +2408,11 @@
             ></CategoryPicker>
         </div>
 
+        <Toggle
+            name="starts_home"
+            label={$formData.starts_home ? "Start zuhause" : "Start woanders"}
+            icon="house"
+        ></Toggle>
         <Toggle
             name="completed"
             label={$formData.completed ? $_("completed") : $_("not-completed")}

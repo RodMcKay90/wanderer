@@ -31,6 +31,9 @@ class Trail {
     elevation_loss?: number;
     duration?: number;
     difficulty?: "easy" | "moderate" | "difficult"
+    route_type?: "loop" | "traversal" | "";
+    starts_home?: boolean;
+    ride_profile?: string;
     lat?: number;
     lon?: number;
     thumbnail?: number;
@@ -76,6 +79,9 @@ class Trail {
             elevation_loss?: number,
             duration?: number,
             difficulty?: "easy" | "moderate" | "difficult",
+            route_type?: "loop" | "traversal" | "",
+            starts_home?: boolean,
+            ride_profile?: string,
             lat?: number,
             lon?: number,
             thumbnail?: number,
@@ -107,6 +113,9 @@ class Trail {
         this.elevation_loss = params?.elevation_loss ?? 0;
         this.duration = params?.duration ?? 0;
         this.difficulty = params?.difficulty ?? "easy";
+        this.route_type = params?.route_type ?? "";
+        this.starts_home = params?.starts_home ?? false;
+        this.ride_profile = params?.ride_profile ?? "";
         this.lat = params?.lat;
         this.lon = params?.lon;
         this.thumbnail = params?.thumbnail ?? 0;
@@ -139,6 +148,9 @@ class Trail {
             date: orig.date,
             description: orig.description,
             difficulty: orig.difficulty,
+            route_type: orig.route_type,
+            starts_home: orig.starts_home,
+            ride_profile: orig.ride_profile,
             completed: orig.completed,
             completed_at: orig.completed_at,
             distance: orig.distance,
@@ -320,6 +332,9 @@ interface TrailBoundingBox {
 
 interface TrailSearchResult {
     id: string;
+    route_type?: "loop" | "traversal" | "";
+    starts_home?: boolean;
+    ride_profile?: string;
     author: string;
     author_name: string;
     author_avatar: string;
@@ -371,6 +386,9 @@ export const defaultTrailSearchAttributes = [
     "elevation_loss",
     "duration",
     "difficulty",
+    "route_type",
+    "starts_home",
+    "ride_profile",
     "category",
     "category_id",
     "category_icon",

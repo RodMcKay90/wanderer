@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { rideProfileLabel, routeTypeIcon, routeTypeLabel } from "#lib/util/ride_attributes.ts";
     import emptyStateTrailDark from "#lib/assets/svgs/empty_states/empty_state_trail_dark.svg";
     import emptyStateTrailLight from "#lib/assets/svgs/empty_states/empty_state_trail_light.svg";
     import type { Trail } from "#lib/models/trail.ts";
@@ -212,9 +213,11 @@
                     </p>
                 {/if}
                 <p class="whitespace-nowrap">
-                    <i class="fa fa-gauge mr-3"></i>{$_(
-                        trail.difficulty ?? "?",
-                    )}
+                    <i class="fa fa-{routeTypeIcon(trail.route_type)} mr-3"
+                    ></i>{routeTypeLabel(trail.route_type)}{#if trail.starts_home}<i
+                            class="fa fa-house ml-3"
+                            title="Start zuhause"
+                        ></i>{/if}
                 </p>
             </div>
         </div>

@@ -132,7 +132,7 @@
         { text: $_("name"), value: "name" },
         { text: $_("distance"), value: "distance" },
         { text: $_("duration"), value: "duration" },
-        { text: $_("difficulty"), value: "difficulty" },
+        { text: "Streckentyp", value: "difficulty" },
         { text: $_("elevation-gain"), value: "elevation_gain" },
         { text: $_("elevation-loss"), value: "elevation_loss" },
         { text: $_("likes"), value: "like_count" },

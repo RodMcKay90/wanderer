@@ -405,6 +405,7 @@ func initData(app core.App, client meilisearch.ServiceManager) error {
 	}
 	go func() {
 		backfilled := backfillPolylines(app)
+		backfilled = append(backfilled, backfillRideAttributes(app)...)
 		rebuilt, err := initMeilisearchDocuments(app, client)
 		if err != nil {
 			app.Logger().Error(fmt.Sprintf("Unable to initialize search documents: %v", err))
@@ -479,6 +480,49 @@ func backfillPolylines(app core.App) []string {
 	return backfilled
 }
 
+// backfillRideAttributes runs the one-time ride attribute detection for
+// trails created before the feature existed.
+func backfillRideAttributes(app core.App) []string {
+	const pageSize int64 = 100
+	var lastID string
+	var updated []string
+
+	for {
+		trails := []*core.Record{}
+		query := app.RecordQuery("trails").
+			AndWhere(dbx.NewExp("ride_attributes_detected = FALSE AND gpx != ''")).
+			OrderBy("id ASC").
+			Limit(pageSize)
+		if lastID != "" {
+			query = query.AndWhere(dbx.NewExp("id > {:lastID}", dbx.Params{"lastID": lastID}))
+		}
+		if err := query.All(&trails); err != nil {
+			log.Printf("backfill ride attributes query failed after trail %q: %v", lastID, err)
+			break
+		}
+		if len(trails) == 0 {
+			break
+		}
+		for _, r := range trails {
+			lastID = r.Id
+			changed, err := util.ApplyRideAttributes(app, r)
+			if err != nil {
+				log.Printf("backfill ride attributes failed for trail %s: %v", r.Id, err)
+			}
+			if !changed {
+				continue
+			}
+			if err := app.UnsafeWithoutHooks().Save(r); err != nil {
+				log.Printf("backfill ride attributes save failed for trail %s: %v", r.Id, err)
+				continue
+			}
+			updated = append(updated, r.Id)
+		}
+	}
+	log.Printf("backfill ride attributes completed: updated=%d", len(updated))
+	return updated
+}
+
 func initCategories(app core.App) error {
 	query := app.RecordQuery("categories")
 	records := []*core.Record{}
@@ -522,6 +566,7 @@ func searchIndexSettings() map[string]meilisearch.Settings {
 				"is_federated", "completed", "date", "difficulty", "distance",
 				"elevation_gain", "elevation_loss", "likes", "public", "shares",
 				"tags", "min_lat", "max_lat", "min_lon", "max_lon", "bounding_box_diagonal",
+				"route_type", "starts_home", "ride_profile",
 			},
 			SortableAttributes: []string{
 				"author", "created", "date", "difficulty", "distance",

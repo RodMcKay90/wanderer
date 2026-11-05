@@ -28,6 +28,14 @@ func CreateTrailHandler(client meilisearch.ServiceManager) func(e *core.RecordEv
 			log.Printf("failed to save polyline for trail %s: %v", record.Id, err)
 		}
 
+		if changed, err := util.ApplyRideAttributes(e.App, record); err != nil {
+			log.Printf("failed to detect ride attributes for trail %s: %v", record.Id, err)
+		} else if changed {
+			if err := e.App.UnsafeWithoutHooks().Save(record); err != nil {
+				log.Printf("failed to save ride attributes for trail %s: %v", record.Id, err)
+			}
+		}
+
 		// add local iri
 		origin := os.Getenv("ORIGIN")
 		if origin == "" {

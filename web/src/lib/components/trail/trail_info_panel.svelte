@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { rideProfileLabel, routeTypeIcon, routeTypeLabel } from "#lib/util/ride_attributes.ts";
     import { sanitizeHTML } from "#lib/util/sanitize_html.ts";
     import { goto } from "$app/navigation";
     import { page } from "$app/state";
@@ -710,9 +711,21 @@
                             </h3>
                         {/if}
                         <h3>
-                            <i class="fa fa-gauge mr-2"></i>
-                            {$_(trail.difficulty ?? "?")}
+                            <i class="fa fa-{routeTypeIcon(trail.route_type)} mr-2"></i>
+                            {routeTypeLabel(trail.route_type)}
                         </h3>
+                        {#if trail.ride_profile}
+                            <h3>
+                                <i class="fa fa-sliders mr-2"></i>
+                                {rideProfileLabel(trail.ride_profile)}
+                            </h3>
+                        {/if}
+                        {#if trail.starts_home}
+                            <h3>
+                                <i class="fa fa-house mr-2"></i>
+                                Start zuhause
+                            </h3>
+                        {/if}
                         <h3>
                             <i
                                 class="fa {trail.completed

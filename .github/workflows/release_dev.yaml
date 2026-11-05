@@ -7,6 +7,7 @@ on:
 
 jobs:
   docker-build:
+    if: github.repository_owner == 'open-wanderer'
     runs-on: ubuntu-latest
     permissions:
       contents: read

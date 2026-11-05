@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { routeTypeLabel } from "#lib/util/ride_attributes.ts";
     import { goto } from "$app/navigation";
     import type { Trail, TrailFilter } from "#lib/models/trail.ts";
     import {
@@ -227,7 +228,7 @@
                             {formatTimeHHMM(trail.duration)}
                         </td>
                         <td class="p-4 text-sm">
-                            {$_(trail.difficulty ?? "easy")}
+                            {routeTypeLabel(trail.route_type)}{#if trail.starts_home}<i class="fa fa-house ml-2" title="Start zuhause"></i>{/if}
                         </td>
                         <td class="p-4 text-sm whitespace-nowrap">
                             {formatElevation(trail.elevation_gain)}
