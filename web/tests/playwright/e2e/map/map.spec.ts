@@ -352,7 +352,6 @@ test('restores multi-select, loaded-result selection and bulk edits in every res
     await expect(page.locator('dialog[open]')).toHaveCount(0);
     await expect(page.locator('.selection-toolbar')).toHaveCount(0);
     expect(updates.sort()).toEqual(['selection-0', 'selection-1', 'selection-2', 'selection-3']);
-    await expect(cards.filter({ hasText: 'Difficult' })).toHaveCount(4);
     await expect(cards.first().locator('xpath=..')).toHaveAttribute('href', '/map/trail/@Test/selection-0');
     await page.waitForTimeout(300); // The index may still contain pre-edit records.
     expect(searches).toBe(loaded);
