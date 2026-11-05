@@ -40,11 +40,28 @@ if (UPLOAD_FOLDER) {
     const [token] = relative.split(path.sep);
 
     if (!token || token === '.' || path.basename(filePath).startsWith('.')) return;
+    if (relative.split(path.sep).length < 2) {
+      console.error(`[File Watcher] Skipping ${relative}: put files into a sub-folder named after your API token`);
+      return;
+    }
 
     uploadQueue = uploadQueue.then(() => uploadFile(filePath, token));
   });
 
+  // On container start the server may not be listening yet.
+  async function waitForServer() {
+    for (let i = 0; i < 60; i++) {
+      try {
+        await fetch(ORIGIN, { method: 'HEAD' });
+        return;
+      } catch {
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      }
+    }
+  }
+
   async function uploadFile(filePath, token) {
+    await waitForServer();
     try {
       const fileBuffer = fs.readFileSync(filePath);
       const fileBlob = new Blob([fileBuffer]);
