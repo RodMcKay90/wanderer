@@ -21,7 +21,8 @@ if (UPLOAD_FOLDER) {
 
   const watcher = chokidar.watch(uploadPath, {
     persistent: true,
-    ignoreInitial: true,
+    // Also pick up files that were already waiting when the container started.
+    ignoreInitial: false,
     awaitWriteFinish: {
       stabilityThreshold: 2000,
       pollInterval: 100
