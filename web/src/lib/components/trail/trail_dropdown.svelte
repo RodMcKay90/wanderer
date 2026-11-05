@@ -725,6 +725,15 @@
                 ...(changes.difficulty
                     ? { difficulty: changes.difficulty }
                     : {}),
+                ...(changes.route_type
+                    ? { route_type: changes.route_type }
+                    : {}),
+                ...(changes.ride_profile
+                    ? { ride_profile: changes.ride_profile }
+                    : {}),
+                ...(changes.starts_home !== undefined
+                    ? { starts_home: changes.starts_home }
+                    : {}),
             };
 
             try {

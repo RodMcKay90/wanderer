@@ -260,9 +260,9 @@ test('restores multi-select, loaded-result selection and bulk edits in every res
     const updates: string[] = [];
     await context.route('**/api/v1/trail/form/selection-*', route => {
         const id = new URL(route.request().url()).pathname.split('/').at(-1)!;
-        expect(route.request().postData()).toContain('difficult');
+        expect(route.request().postData()).toContain('traversal');
         updates.push(id);
-        return route.fulfill({ json: { id, difficulty: 'difficult', author: actor, photos: [], tags: [] } });
+        return route.fulfill({ json: { id, route_type: 'traversal', author: actor, photos: [], tags: [] } });
     });
     await openMap(page);
     const cards = page.locator('.trail-list .trail-card');
@@ -346,8 +346,8 @@ test('restores multi-select, loaded-result selection and bulk edits in every res
     await page.waitForTimeout(300); // Negative check must outlast the 200 ms viewport debounce.
     expect(searches).toBe(loaded);
     await page.locator('.map-results-container').evaluate(element => element.style.width = '');
-    await dialog.locator('label').filter({ hasText: 'Difficulty' }).locator('input').check();
-    await dialog.locator('select').selectOption('difficult');
+    await dialog.locator('label').filter({ hasText: 'Streckentyp' }).locator('input').check();
+    await dialog.locator('select').selectOption('traversal');
     await dialog.locator('.btn-primary').click();
     await expect(page.locator('dialog[open]')).toHaveCount(0);
     await expect(page.locator('.selection-toolbar')).toHaveCount(0);

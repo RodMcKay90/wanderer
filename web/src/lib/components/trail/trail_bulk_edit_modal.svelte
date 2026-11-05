@@ -5,6 +5,9 @@
             subcategory: string;
         };
         difficulty?: "easy" | "moderate" | "difficult";
+        route_type?: "loop" | "traversal";
+        ride_profile?: string;
+        starts_home?: boolean;
     };
 </script>
 
@@ -15,6 +18,11 @@
         type CategoryPickerSelection,
     } from "./category_picker.svelte";
     import { _ } from "svelte-i18n";
+    import {
+        RIDE_PROFILES,
+        ROUTE_TYPES,
+        type RouteType,
+    } from "#lib/util/ride_attributes.ts";
 
     interface Props {
         selectedCount?: number;
@@ -35,22 +43,30 @@
 
     let modal: Modal;
     let applyCategory = $state(false);
-    let applyDifficulty = $state(false);
+    let applyRouteType = $state(false);
+    let applyRideProfile = $state(false);
+    let applyStartsHome = $state(false);
     let categorySelection: CategoryPickerSelection | undefined = $state();
     let categoryValue = $state("");
-    let difficultyValue: "easy" | "moderate" | "difficult" = $state("easy");
+    let routeTypeValue: RouteType = $state("loop");
+    let rideProfileValue: string = $state(RIDE_PROFILES[0].value);
+    let startsHomeValue = $state(true);
     let loading = $state(false);
 
     let canApply = $derived(
-        (applyCategory && categorySelection !== undefined) || applyDifficulty,
+        (applyCategory && categorySelection !== undefined) ||
+            applyRouteType ||
+            applyRideProfile ||
+            applyStartsHome,
     );
 
     export function openModal() {
         applyCategory = false;
-        applyDifficulty = false;
+        applyRouteType = false;
+        applyRideProfile = false;
+        applyStartsHome = false;
         categorySelection = initialCategorySelection;
         categoryValue = categoryValueFromSelection(initialCategorySelection);
-        difficultyValue = initialDifficulty ?? "easy";
         modal.openModal();
     }
 
@@ -83,8 +99,14 @@
             }
             changes.category = categorySelection;
         }
-        if (applyDifficulty) {
-            changes.difficulty = difficultyValue;
+        if (applyRouteType) {
+            changes.route_type = routeTypeValue;
+        }
+        if (applyRideProfile) {
+            changes.ride_profile = rideProfileValue;
+        }
+        if (applyStartsHome) {
+            changes.starts_home = startsHomeValue;
         }
 
         loading = true;
@@ -133,18 +155,53 @@
                 <input
                     type="checkbox"
                     class="h-4 w-4 accent-primary"
-                    bind:checked={applyDifficulty}
+                    bind:checked={applyRouteType}
                 />
-                <span class="font-medium">{$_("difficulty")}</span>
+                <span class="font-medium">Streckentyp</span>
             </label>
-            {#if applyDifficulty}
+            {#if applyRouteType}
                 <Select
-                    value={difficultyValue}
-                    onchange={(value) => (difficultyValue = value)}
+                    value={routeTypeValue}
+                    onchange={(value) => (routeTypeValue = value)}
+                    items={ROUTE_TYPES.map((r) => ({
+                        text: r.text,
+                        value: r.value,
+                    }))}
+                ></Select>
+            {/if}
+
+            <label class="flex items-center gap-2">
+                <input
+                    type="checkbox"
+                    class="h-4 w-4 accent-primary"
+                    bind:checked={applyRideProfile}
+                />
+                <span class="font-medium">Profil</span>
+            </label>
+            {#if applyRideProfile}
+                <Select
+                    value={rideProfileValue}
+                    onchange={(value) => (rideProfileValue = value)}
+                    items={RIDE_PROFILES}
+                ></Select>
+            {/if}
+
+            <label class="flex items-center gap-2">
+                <input
+                    type="checkbox"
+                    class="h-4 w-4 accent-primary"
+                    bind:checked={applyStartsHome}
+                />
+                <span class="font-medium">Start zuhause</span>
+            </label>
+            {#if applyStartsHome}
+                <Select
+                    value={startsHomeValue}
+                    onchange={(value) =>
+                        (startsHomeValue = value === true || value === "true")}
                     items={[
-                        { text: $_("easy"), value: "easy" },
-                        { text: $_("moderate"), value: "moderate" },
-                        { text: $_("difficult"), value: "difficult" },
+                        { text: "Ja", value: true },
+                        { text: "Nein", value: false },
                     ]}
                 ></Select>
             {/if}
